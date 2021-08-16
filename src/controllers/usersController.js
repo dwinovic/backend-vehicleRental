@@ -218,7 +218,7 @@ module.exports = {
         return data;
       })
       .catch(next);
-    console.log(oldAvatar);
+    // console.log(oldAvatar);
 
     UserModel.updateUser(id, newData)
       .then(async() => {

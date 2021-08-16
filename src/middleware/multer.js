@@ -24,7 +24,7 @@ const multipleUpload = multer({
   fileFilter: function(req, file, cb) {
     checkFileType(file, cb);
   },
-}).array('image', 8);
+}).array('images', 8);
 
 // END =  MULTIPLE UPLOAD
 

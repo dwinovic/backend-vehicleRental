@@ -1,4 +1,4 @@
-const pagination = async (req, res, next, model) => {
+const pagination = async(req, res, next, model) => {
   // RESPONSE
   const data = {};
 
@@ -10,7 +10,7 @@ const pagination = async (req, res, next, model) => {
   // const queryTables = req.baseUrl.substring(1)
   // query sort and filter
   const querySort = req.query.sort || 'DESC';
-  const queryField = req.query.field || 'updatedAt';
+  const queryField = req.query.field || 'createdAt';
   let page = 1;
   // default limit is 8
 
@@ -82,10 +82,10 @@ const pagination = async (req, res, next, model) => {
   const getDataResult = data.data;
   // console.log(getDataResult);
   getDataResult.forEach((item) => {
-    const getImageResponse = item.imageProduct;
+    const getImageResponse = item.images;
     if (getImageResponse) {
       const parseToArray = getImageResponse.split(',').shift();
-      item.imageProduct = parseToArray;
+      item.images = parseToArray;
     }
   });
   // console.log('getDataResult', getDataResult);
