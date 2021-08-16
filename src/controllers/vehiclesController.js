@@ -69,7 +69,7 @@ module.exports = {
         }
       }
       // SEARCHING
-      if (req.query.src || req.query.category) {
+      if (req.query.src || req.query.type) {
         srcFeature(req, res, next, searchProductsModel).then(() => {
           // console.log(Object.keys(res.result));
           const { data, meta, error } = res.result;
