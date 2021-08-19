@@ -5,15 +5,15 @@ const { verifyAccess } = require('../middleware/auth');
 const { singleUpload } = require('../middleware/multer');
 
 router
-  .get('/', verifyAccess, userController.getAllUsers)
-  .get('/verify-token', verifyAccess, userController.verifyTokenUser)
+  .get('/', userController.getAllUsers)
+  .get('/verify-token', userController.verifyTokenUser)
   .post('/register', userController.createUser)
   .post('/login', userController.loginUser)
   .post('/forgot-password', userController.getUserByEmail)
-  .patch('/change-password/:id', verifyAccess, userController.updatePassword)
-  .get('/:id', verifyAccess, userController.getUserId)
-  .patch('/:id', verifyAccess, singleUpload, userController.updateUser)
+  .patch('/change-password/:id', userController.updatePassword)
+  .get('/:id', userController.getUserId)
+  .patch('/:id', singleUpload, userController.updateUser)
 
-.delete('/:id', verifyAccess, userController.deleteUser);
+  .delete('/:id', userController.deleteUser);
 
 module.exports = router;

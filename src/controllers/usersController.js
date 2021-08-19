@@ -16,7 +16,7 @@ const verifiedEmail = require('../helpers/verifiedEmail');
 const privateKey = process.env.PRIVATE_KEY;
 
 module.exports = {
-  getAllUsers: async(req, res, next) => {
+  getAllUsers: async (req, res, next) => {
     try {
       // PAGINATION
       if (!req.query.src) {
@@ -60,7 +60,8 @@ module.exports = {
             srcResponse(
               res,
               error.statusCode,
-              meta, {},
+              meta,
+              {},
               error.message,
               error.message
             );
@@ -91,14 +92,16 @@ module.exports = {
           response(res, 404, {}, message, 'Failed');
         }
         const data = result[0];
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             id: data.idUser,
             email: data.email,
             role: data.role,
             name: data.name,
             verified: data.verified,
           },
-          privateKey, { expiresIn: '8h' }
+          privateKey,
+          { expiresIn: '8h' }
         );
         requestNewPasswordVerification(email, data.name, token);
         response(res, 200, 'Email verification have been send');
@@ -143,19 +146,22 @@ module.exports = {
       .then(() => {
         // const email = 'cahyaulin@gmail.com';
         // JWT Token
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             id: dataUser.idUser,
             email: dataUser.email,
             role: dataUser.role,
             name: dataUser.name,
             actived: 0,
           },
-          privateKey, { expiresIn: '24h' }
+          privateKey,
+          { expiresIn: '24h' }
         );
         verifiedEmail(dataUser.email, dataUser.name, token);
 
         const dataResponse = dataUser;
         delete dataResponse.password;
+        dataResponse.token = token;
         response(res, 200, dataResponse);
       })
       .catch((err) => {
@@ -166,7 +172,7 @@ module.exports = {
         console.log(err);
       });
   },
-  updateUser: async(req, res, next) => {
+  updateUser: async (req, res, next) => {
     // Request
     const id = req.params.id;
 
@@ -221,7 +227,7 @@ module.exports = {
     // console.log(oldAvatar);
 
     UserModel.updateUser(id, newData)
-      .then(async() => {
+      .then(async () => {
         // console.log(result);
         try {
           await fs.unlinkSync(`public/images/${oldAvatar}`);
@@ -244,10 +250,10 @@ module.exports = {
     UserModel.getUserId(id)
       .then((result) => {
         const hashPassowrdDB = result[0].password;
-        bcrypt.compare(currentPassword, hashPassowrdDB, function(err, result) {
+        bcrypt.compare(currentPassword, hashPassowrdDB, function (err, result) {
           if (result == true) {
             const saltRounds = 10;
-            bcrypt.hash(newPassword, saltRounds, function(err, hash) {
+            bcrypt.hash(newPassword, saltRounds, function (err, hash) {
               const newPasswordInsert = {
                 password: hash,
               };
@@ -308,20 +314,24 @@ module.exports = {
           response(res, 404, {}, message, 'Cannot login');
         }
         // JWT Token
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             email: dataUserRes.email,
             role: dataUserRes.role,
             name: dataUserRes.name,
           },
-          privateKey, { expiresIn: '12h' }
+          privateKey,
+          { expiresIn: '12h' }
         );
 
-        const refreshToken = jwt.sign({
+        const refreshToken = jwt.sign(
+          {
             email: dataUserRes.email,
             role: dataUserRes.role,
             name: dataUserRes.name,
           },
-          privateKey, { expiresIn: `${24 * 7}h` }
+          privateKey,
+          { expiresIn: `${24 * 7}h` }
         );
 
         delete dataUserRes.password;

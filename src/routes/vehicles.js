@@ -12,9 +12,9 @@ const { verifyAccess, sellerAccess } = require('../middleware/auth');
 
 router
   .get('/', getAllVehicles)
-  .post('/', verifyAccess, sellerAccess, multipleUpload, createNewVehicle)
-  .get('/:id', verifyAccess, getItemVehicle)
-  .patch('/:id', verifyAccess, sellerAccess, multipleUpload, updateVehicle)
-  .delete('/:id', verifyAccess, sellerAccess, deleteVehicle);
+  .post('/', multipleUpload, createNewVehicle)
+  .get('/:id', getItemVehicle)
+  .patch('/:id', multipleUpload, updateVehicle)
+  .delete('/:id', deleteVehicle);
 
 module.exports = router;

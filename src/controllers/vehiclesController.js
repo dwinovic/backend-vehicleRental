@@ -23,7 +23,7 @@ const { createNewMedia } = require('../models/Media');
 const uid = uidshort();
 
 module.exports = {
-  getAllVehicles: async(req, res, next) => {
+  getAllVehicles: async (req, res, next) => {
     try {
       // PAGINATION
       if (!req.query.src) {
@@ -77,7 +77,8 @@ module.exports = {
             srcResponse(
               res,
               error.statusCode,
-              meta, {},
+              meta,
+              {},
               error.message,
               error.message
             );
@@ -142,7 +143,7 @@ module.exports = {
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
     dataFilesRequest.forEach((item, index) => {
-      tmpImage.push(item.filename);
+      tmpImage.push(`${process.env.HOST_SERVER}/files/${item.filename}`);
     });
     const imagesStr = tmpImage.toString();
     // END = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
@@ -199,7 +200,7 @@ module.exports = {
     // });
     // END = HANDLE UPLOAD IMAGE WITH RELATIONAL TABLE MEDIA
   },
-  updateVehicle: async(req, res) => {
+  updateVehicle: async (req, res) => {
     const id = req.params.id;
 
     // START = UPDATE LIKES VEHICLES
@@ -279,7 +280,7 @@ module.exports = {
     updateItemVehicle(id, dataVehicle)
       .then(() => {
         // Delete old images
-        dataImageOld.forEach(async(image) => {
+        dataImageOld.forEach(async (image) => {
           try {
             await fs.unlinkSync(`public/images/${image}`);
             console.log(`successfully deleted ${image}`);
@@ -298,7 +299,7 @@ module.exports = {
 
     // END = UPDATE DATA ALL VEHICLES
   },
-  deleteVehicle: async(req, res, next) => {
+  deleteVehicle: async (req, res, next) => {
     const id = req.params.id;
 
     const oldImages = await getItemVehicle(id)
@@ -310,7 +311,7 @@ module.exports = {
       .catch(next);
 
     try {
-      oldImages.forEach(async(item) => {
+      oldImages.forEach(async (item) => {
         await fs.unlinkSync(`public/images/${item}`);
         console.log(`successfully deleted ${item}`);
       });

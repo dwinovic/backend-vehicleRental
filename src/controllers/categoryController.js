@@ -1,5 +1,6 @@
 const { response } = require('../helpers');
 const category = require('../models/category');
+const short = require('short-uuid');
 
 const {
   createCategory,
@@ -12,11 +13,13 @@ const {
 module.exports = {
   createCategory: (req, res) => {
     // Request
-    const { nameCategory } = req.body;
-    const dataFilesRequest = req.file;
-    const image = dataFilesRequest.filename;
-
-    const data = { nameCategory, image };
+    const { name } = req.body;
+    // UUID
+    const newUID = short.generate();
+    const data = {
+      idCategory: newUID,
+      name,
+    };
     // console.log(data);
     createCategory(data)
       .then(() => {
@@ -36,6 +39,7 @@ module.exports = {
       });
   },
   getItemCategory: (req, res) => {
+    // BELUM BERFUNGSI
     const id = req.params.id;
     getItemCategory(id)
       .then((result) => {
@@ -46,6 +50,8 @@ module.exports = {
       });
   },
   updateCategory: (req, res) => {
+    // BELUM BERFUNGSI
+
     // Request
     const { nameCategory } = req.body;
     const id = req.params.id;
@@ -62,6 +68,8 @@ module.exports = {
       });
   },
   deleteCategory: (req, res) => {
+    // BELUM BERFUNGSI
+
     const id = req.params.id;
     deleteCategory(id)
       .then(() => {
