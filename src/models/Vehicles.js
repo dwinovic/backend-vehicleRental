@@ -1,6 +1,6 @@
 const querySQL = require('../helpers/querySql');
 
-const getAllVehicles = async(field, sortBy, limit, offset) => {
+const getAllVehicles = async (field, sortBy, limit, offset) => {
   // const queryJoin = `SELECT
   //   vehicles.idVehicles,
   //   vehicles.name,
@@ -51,7 +51,7 @@ const updateItemVehicle = (id, data) => {
   return querySQL('UPDATE vehicles SET ? WHERE idVehicles = ?', [data, id]);
 };
 
-const searchVehiclesModel = async(
+const searchVehiclesModel = async (
   value,
   limit,
   table,
@@ -69,8 +69,9 @@ const searchVehiclesModel = async(
   // `SELECT COUNT(*) from ${table} WHERE MATCH(nameProduct, description) AGAINST(${value} WITH QUERY EXPANSION)`
 
   const getCountRows = await querySQL(
-    `SELECT COUNT(*) FROM ${table} WHERE name LIKE '%${value}%' OR type LIKE '%${value} OR description LIKE '%${value}%'`
+    `SELECT COUNT(*) FROM vehicles JOIN categories ON (vehicles.category = categories.idCategory) WHERE vehicles.name LIKE '%${value}%' OR categories.name LIKE '%${value}'`
   );
+
   // console.log(getCountRows);
   const dataCountRows = getCountRows[0];
   const numDataCountRows = Object.values(dataCountRows)[0];
@@ -78,11 +79,12 @@ const searchVehiclesModel = async(
   // console.log(typeof offset);
 
   // const queryByCategory = `WHERE category.nameCategory LIKE '%${category}%'`;
-  const querySearching = `WHERE name LIKE '%${value}%' OR description LIKE '%${value}%' OR type LIKE '%${value}%'`;
+  const querySearching = `WHERE vehicles.name LIKE '%${value}%' OR categories.name LIKE '%${value}%'`;
 
   const limitResult = await querySQL(
-    `SELECT vehicles.idVehicles, vehicles.name,  vehicles.location, vehicles.status, vehicles.capacity, vehicles.stock, vehicles.type, vehicles.description, vehicles.price, vehicles.paymentOption, vehicles.likes, vehicles.idOwner FROM ${table} ORDER BY ${field} ${sortBy} LIMIT ${limit} OFFSET ${offset}`
+    `SELECT vehicles.idVehicles, vehicles.name,  vehicles.location, categories.name, vehicles.status, vehicles.capacity, vehicles.stock, vehicles.category, vehicles.description, vehicles.price, vehicles.paymentOption, vehicles.likes, vehicles.idOwner, vehicles.createdAt, vehicles.updatedAt FROM vehicles JOIN categories ON (vehicles.category = categories.idCategory) ${querySearching} ORDER BY ${field} ${sortBy} LIMIT ${limit} OFFSET ${offset}`
   );
+  // console.log('limitResult', limitResult);
 
   // totalPage
   const totalPageBefore = numDataCountRows / limit; // 2.374
@@ -95,7 +97,7 @@ const searchVehiclesModel = async(
   } else {
     totalPageAfter = parseInt(convertMin);
   }
-  // console.log(totalPageAfter);
+  console.log('limitResult', limitResult);
 
   // console.log(1, totalPageBefore);
   // console.log(2, convertMin);

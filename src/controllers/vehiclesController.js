@@ -12,6 +12,7 @@ const {
   createNewProductModel,
 } = require('../models/products');
 const {
+  searchVehiclesModel,
   createNewVehicle,
   getAllVehicles,
   getItemVehicle,
@@ -70,7 +71,7 @@ module.exports = {
       }
       // SEARCHING
       if (req.query.src || req.query.type) {
-        srcFeature(req, res, next, searchProductsModel).then(() => {
+        srcFeature(req, res, next, searchVehiclesModel).then(() => {
           // console.log(Object.keys(res.result));
           const { data, meta, error } = res.result;
           if (error.statusCode && error.message) {
@@ -130,7 +131,7 @@ module.exports = {
       status,
       capacity,
       stock,
-      type,
+      category,
       description,
       price,
       paymentOption,
@@ -160,7 +161,7 @@ module.exports = {
       status,
       capacity,
       stock,
-      type,
+      category,
       description,
       price,
       paymentOption,

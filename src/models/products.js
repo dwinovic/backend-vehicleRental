@@ -1,7 +1,7 @@
 const querySQL = require('../helpers/querySql');
 
 module.exports = {
-  getAllProductsModel: async(field, sortBy, limit, offset) => {
+  getAllProductsModel: async (field, sortBy, limit, offset) => {
     //   const queryJoin = `SELECT
     //   products.id,
     //   products.nameProduct,
@@ -44,7 +44,7 @@ module.exports = {
     return querySQL('DELETE FROM products WHERE id = ?', id);
   },
 
-  searchProductsModel: async(
+  searchProductsModel: async (
     value,
     limit,
     table,
