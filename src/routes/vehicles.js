@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { uploadFile, multipleUpload } = require('../middleware/multer');
+const { singleUpload, multipleUpload } = require('../middleware/multer');
 const {
   getAllVehicles,
+  checkImageInput,
   getItemVehicle,
   createNewVehicle,
   updateVehicle,
@@ -13,6 +14,7 @@ const { verifyAccess, sellerAccess } = require('../middleware/auth');
 router
   .get('/', getAllVehicles)
   .post('/', multipleUpload, createNewVehicle)
+  .post('/images', singleUpload, checkImageInput)
   .get('/:id', getItemVehicle)
   .patch('/:id', multipleUpload, updateVehicle)
   .delete('/:id', deleteVehicle);

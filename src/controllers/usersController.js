@@ -176,30 +176,55 @@ module.exports = {
     // Request
     const id = req.params.id;
 
-    const {
-      name,
-      email,
-      born,
-      phone,
-      role,
-      actived,
-      activedDate,
-      gender,
-      address,
-      avatar,
-    } = req.body;
+    // UPDATE AVATAR
+    if (req.file) {
+      const dataFilesRequest = req.file;
+
+      let avatarUpload;
+
+      if (dataFilesRequest) {
+        avatarUpload =
+          `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` ||
+          null;
+      }
+
+      const newData = {
+        avatar: avatarUpload ? avatarUpload : avatar,
+        updatedAt: new Date(),
+      };
+      // OLD Images
+      const oldAvatar = await UserModel.getUserId(id)
+        .then((result) => {
+          const data = result[0].avatar;
+          return data;
+        })
+        .catch(next);
+      // console.log(oldAvatar);
+
+      UserModel.updateUser(id, newData)
+        .then(async () => {
+          // console.log(result);
+          try {
+            await fs.unlinkSync(`public/images/${oldAvatar}`);
+            console.log(`successfully deleted ${oldAvatar}`);
+          } catch (err) {
+            console.error('there was an error:', err.message);
+          }
+
+          response(res, 200, newData, {}, 'Success updated user!');
+        })
+        .catch((err) => {
+          next(err);
+        });
+    }
+    // UPDATE AVATAR
+
+    const { name, born, phone, role, actived, activedDate, gender, address } =
+      req.body;
 
     // Hashing Password
     // const salt = bcrypt.genSaltSync(10);
     // const hash = bcrypt.hashSync(password, salt);
-
-    const dataFilesRequest = req.file;
-
-    let avatarUpload;
-
-    if (dataFilesRequest) {
-      avatarUpload = dataFilesRequest.filename || null;
-    }
 
     const newData = {
       idUser: id,
@@ -212,7 +237,6 @@ module.exports = {
       activedDate,
       gender,
       address,
-      avatar,
       avatar: avatarUpload ? avatarUpload : avatar,
       updatedAt: new Date(),
     };

@@ -5,27 +5,41 @@ const client = redis.createClient();
 const fs = require('fs');
 
 const {
-  searchProductsModel,
-  getAllProductsModel,
-  deleteProduct,
-  getItemProductModel,
-  createNewProductModel,
-} = require('../models/products');
-const {
   searchVehiclesModel,
   createNewVehicle,
   getAllVehicles,
   getItemVehicle,
   deleteVehicle,
   updateItemVehicle,
+  filterLocationAndCategory,
 } = require('../models/Vehicles');
 const { createNewMedia } = require('../models/Media');
+const filterFeature = require('../helpers/filterFeature');
 
 const uid = uidshort();
 
 module.exports = {
   getAllVehicles: async (req, res, next) => {
     try {
+      // filter location and category
+      if (req.query.location || req.query.category) {
+        filterFeature(req, res, next, filterLocationAndCategory).then(() => {
+          // console.log(Object.keys(res.result));
+          const { data, meta, error } = res.result;
+          if (error.statusCode && error.message) {
+            srcResponse(
+              res,
+              error.statusCode,
+              meta,
+              {},
+              error.message,
+              error.message
+            );
+          } else {
+            srcResponse(res, 200, meta, data, {});
+          }
+        });
+      }
       // PAGINATION
       if (!req.query.src) {
         const result = await pagination(req, res, next, getAllVehicles);
@@ -105,22 +119,23 @@ module.exports = {
         if (result.length < 1) {
           response(res, 404, {}, {}, 'Vehicles Not Found!');
         }
-        const product = result[0];
+        const vehicle = result[0];
 
         // START = HANDLE IMAGE
-        const oldImages = product.images.split(',');
+        const oldImages = vehicle.images.split(',');
         let newImages = [];
         oldImages.forEach((item) => {
           newImages.push(item);
         });
-        // delete product.images;
-        const responseData = product;
+        // delete vehicle.images;
+        const responseData = vehicle;
         responseData.images = newImages;
         // END = HANDLE IMAGE
 
         response(res, 200, responseData);
       })
       .catch((err) => {
+        console.log(err);
         response(res, 500, {}, err);
       });
   },
@@ -140,6 +155,7 @@ module.exports = {
     } = req.body;
 
     const dataFilesRequest = req.files;
+    // console.log(dataFilesRequest);
 
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
@@ -257,7 +273,7 @@ module.exports = {
       status,
       capacity,
       stock,
-      type,
+      category,
       description,
       price,
       paymentOption,
@@ -299,6 +315,17 @@ module.exports = {
       });
 
     // END = UPDATE DATA ALL VEHICLES
+  },
+  checkImageInput: async (req, res) => {
+    try {
+      const imageUpload = req.file;
+      const nameImage = imageUpload.filename;
+      await fs.unlinkSync(`public/images/${nameImage}`);
+      console.log(`successfully deleted ${nameImage}`);
+      response(res, 200, {}, {}, 'Image upload passed!');
+    } catch (error) {
+      // console.error('there was an error:', error.message);
+    }
   },
   deleteVehicle: async (req, res, next) => {
     const id = req.params.id;
