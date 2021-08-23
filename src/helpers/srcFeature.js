@@ -1,4 +1,5 @@
 const srcFeature = async (req, res, next, model) => {
+  const idUser = req.params.id;
   const querySrc = req.query.src || '';
   const queryLimit = parseInt(req.query.limit);
   const queryTables = req.baseUrl.substring(1);
@@ -24,7 +25,8 @@ const srcFeature = async (req, res, next, model) => {
     queryField,
     querySort,
     startIndex,
-    categoryQuery
+    categoryQuery,
+    idUser
   )
     .then((result) => {
       // console.log(result);

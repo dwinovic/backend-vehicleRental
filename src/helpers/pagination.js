@@ -1,7 +1,8 @@
-const pagination = async(req, res, next, model) => {
+const pagination = async (req, res, next, model) => {
   // RESPONSE
   const data = {};
-
+  // IS ID USER
+  const idUser = req.params.id;
   // default route, don't have a quey param, pure url
   const isQueryParams = Object.keys(req.query);
   // query pagination
@@ -26,7 +27,7 @@ const pagination = async(req, res, next, model) => {
   if (isQueryParams.length === 0) {
     limit;
     startIndex = 0;
-    await model(queryField, querySort, limit, startIndex)
+    await model(queryField, querySort, limit, startIndex, idUser)
       .then((result) => {
         // console.log(result.countRows);
         // console.log(Object.keys(result));
