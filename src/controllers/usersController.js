@@ -110,12 +110,20 @@ module.exports = {
   },
   verifyTokenUser: (req, res) => {
     const decodeResult = req.user;
-    UserModel.getUserEmail(decodeResult.email).then((result) => {
-      const dataResult = result[0];
-      delete dataResult.password;
-      response(res, 200, dataResult);
-    });
+    // console.log(decodeResult);
+    UserModel.getUserId(id)
+      .then((result) => {
+        const data = result;
+        response(res, 200, data);
+      })
+      .catch(next);
+    // UserModel.getUserEmail(decodeResult.email).then((result) => {
+    //   const dataResult = result[0];
+    //   delete dataResult.password;
+    //   response(res, 200, dataResult);
+    // });
   },
+
   createUser: (req, res, next) => {
     const { email, password, name, role } = req.body;
     // Hashing Password
@@ -175,72 +183,76 @@ module.exports = {
   updateUser: async (req, res, next) => {
     // Request
     const id = req.params.id;
-
-    // UPDATE AVATAR
-    if (req.file) {
-      const dataFilesRequest = req.file;
-
-      let avatarUpload;
-
-      if (dataFilesRequest) {
-        avatarUpload =
-          `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` ||
-          null;
-      }
-
-      const newData = {
-        avatar: avatarUpload ? avatarUpload : avatar,
-        updatedAt: new Date(),
-      };
-      // OLD Images
-      const oldAvatar = await UserModel.getUserId(id)
-        .then((result) => {
-          const data = result[0].avatar;
-          return data;
-        })
-        .catch(next);
-      // console.log(oldAvatar);
-
-      UserModel.updateUser(id, newData)
-        .then(async () => {
-          // console.log(result);
-          try {
-            await fs.unlinkSync(`public/images/${oldAvatar}`);
-            console.log(`successfully deleted ${oldAvatar}`);
-          } catch (err) {
-            console.error('there was an error:', err.message);
-          }
-
-          response(res, 200, newData, {}, 'Success updated user!');
-        })
-        .catch((err) => {
-          next(err);
-        });
-    }
-    // UPDATE AVATAR
-
-    const { name, born, phone, role, actived, activedDate, gender, address } =
+    const { name, born, phone, actived, activedDate, gender, address } =
       req.body;
+    console.log('idUser', id);
+    // UPDATE AVATAR
+    // if (req.file) {
+    //   const dataFilesRequest = req.file;
+
+    //   let avatarUpload;
+
+    //   if (dataFilesRequest) {
+    //     avatarUpload =
+    //       `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` ||
+    //       null;
+    //   }
+
+    //   const newData = {
+    //     avatar: avatarUpload ? avatarUpload : avatar,
+    //     updatedAt: new Date(),
+    //   };
+    //   // OLD Images
+    //   const oldAvatar = await UserModel.getUserId(id)
+    //     .then((result) => {
+    //       const data = result[0].avatar;
+    //       return data;
+    //     })
+    //     .catch(next);
+    //   // console.log(oldAvatar);
+
+    //   UserModel.updateUser(id, newData)
+    //     .then(async () => {
+    //       // console.log(result);
+    //       try {
+    //         await fs.unlinkSync(`public/images/${oldAvatar}`);
+    //         console.log(`successfully deleted ${oldAvatar}`);
+    //       } catch (err) {
+    //         console.error('there was an error:', err.message);
+    //       }
+
+    //       response(res, 200, newData, {}, 'Success updated user!');
+    //     })
+    //     .catch((err) => {
+    //       next(err);
+    //     });
+    // }
+    // UPDATE AVATAR
+
+    let avatarUpload;
+    const dataFilesRequest = req.file;
+
+    if (dataFilesRequest) {
+      avatarUpload =
+        `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` || null;
+    }
 
     // Hashing Password
     // const salt = bcrypt.genSaltSync(10);
     // const hash = bcrypt.hashSync(password, salt);
 
     const newData = {
-      idUser: id,
       name,
-      email,
       born,
       phone,
-      role,
       actived,
       activedDate,
       gender,
       address,
-      avatar: avatarUpload ? avatarUpload : avatar,
+      avatar: avatarUpload ? avatarUpload : null,
       updatedAt: new Date(),
     };
-
+    console.log('newData update User', newData);
     // OLD Images
     const oldAvatar = await UserModel.getUserId(id)
       .then((result) => {
@@ -317,8 +329,8 @@ module.exports = {
     UserModel.getUserEmail(dataUserLogin.email)
       .then((result) => {
         const dataUserRes = result[0];
-
         // console.log(dataUserRes);
+
         let message;
 
         // Email Validation
@@ -340,6 +352,7 @@ module.exports = {
         // JWT Token
         const token = jwt.sign(
           {
+            idUser: dataUserRes.idUser,
             email: dataUserRes.email,
             role: dataUserRes.role,
             name: dataUserRes.name,
@@ -357,13 +370,50 @@ module.exports = {
           privateKey,
           { expiresIn: `${24 * 7}h` }
         );
-
+        // console.log(dataUserRes.avatar);
+        const ageCookie = 60000 * 60 * 3;
         delete dataUserRes.password;
+        // Set Cookies token
+        // 60 * 60 * 24 * 3
+        res.cookie('idUser', dataUserRes.idUser, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('token', token, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('role', dataUserRes.role, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
         dataUserRes.token = token;
         dataUserRes.refresh = refreshToken;
 
         response(res, 200, dataUserRes, {}, 'Login success');
       })
       .catch(next);
+  },
+  logout: (req, res, next) => {
+    res.clearCookie('tokenvr');
+    res.clearCookie('rolevr');
+    res.clearCookie('avatarvr');
+    response(res, 200, {}, {}, 'Success logout');
   },
 };

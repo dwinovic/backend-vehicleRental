@@ -13,10 +13,10 @@ const { verifyAccess, sellerAccess } = require('../middleware/auth');
 
 router
   .get('/', getAllVehicles)
-  .post('/', multipleUpload, createNewVehicle)
-  .post('/images', singleUpload, checkImageInput)
-  .get('/:id', getItemVehicle)
-  .patch('/:id', multipleUpload, updateVehicle)
-  .delete('/:id', deleteVehicle);
+  .post('/', verifyAccess, multipleUpload, createNewVehicle)
+  .post('/images', verifyAccess, singleUpload, checkImageInput)
+  .get('/:id', verifyAccess, getItemVehicle)
+  .patch('/:id', verifyAccess, multipleUpload, updateVehicle)
+  .delete('/:id', verifyAccess, deleteVehicle);
 
 module.exports = router;

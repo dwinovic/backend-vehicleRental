@@ -5,15 +5,17 @@ const privateKey = process.env.PRIVATE_KEY;
 
 const verifyAccess = (req, res, next) => {
   // Request
-  const tokenHeader = req.headers.authorization;
+  // const tokenHeader = req.headers.authorization;
+  // Setting Verify from Cookie
+  const token = req.cookies.token;
 
-  if (!tokenHeader) {
+  if (!token) {
     const error = new Error('Server need token');
     error.status = 401;
     return next(error);
   }
 
-  const token = tokenHeader.split(' ')[1];
+  // const token = tokenHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, privateKey);
     req.user = decoded;

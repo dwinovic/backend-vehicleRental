@@ -249,21 +249,33 @@ module.exports = {
       status,
       capacity,
       stock,
-      type,
+      category,
       description,
       price,
-      paymentOption,
+      images,
     } = req.body;
-
+    console.log('images', images);
     const dataFilesRequest = req.files;
-    // console.log('dataFilesRequest', dataFilesRequest);
+    console.log('dataFilesRequest', dataFilesRequest);
 
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
-    dataFilesRequest.forEach((item, index) => {
-      tmpImage.push(item.filename);
-    });
-    const imagesStr = tmpImage.toString();
+
+    if (dataFilesRequest) {
+      dataFilesRequest.forEach((item, index) => {
+        tmpImage.push(`${process.env.HOST_SERVER}/files/${item.filename}`);
+      });
+    }
+    if (images) {
+      console.log(images);
+      images.forEach((item, index) => {
+        if (item !== 'undefined' && item !== 'false') {
+          tmpImage.push(item);
+        }
+      });
+    }
+    let imagesStr = tmpImage.toString();
+    console.log('imagesStr', imagesStr);
     // END = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
 
     // Data UPDATE TO  DB
@@ -276,7 +288,6 @@ module.exports = {
       category,
       description,
       price,
-      paymentOption,
       images: imagesStr,
       updatedAt: new Date(),
     };

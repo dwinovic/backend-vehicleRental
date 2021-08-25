@@ -7,7 +7,7 @@ const srcFeature = async (req, res, next, model) => {
   const queryPage = req.query.page || 1;
   const queryField = req.query.field || 'updatedAt';
   const categoryQuery = req.query.type || '';
-  console.log(categoryQuery);
+  // console.log(categoryQuery);
 
   const limit = queryLimit || 8;
 

@@ -10,9 +10,9 @@ const { verifyAccess, sellerAccess } = require('../middleware/auth');
 const router = express.Router();
 
 router
-  .post('/', createHistory)
-  .get('/:id', getAllHistory)
-  .post('/:id', updateItemTransaction)
-  .delete('/:id', deleteItemHistory);
+  .post('/', verifyAccess, createHistory)
+  .get('/:id', verifyAccess, getAllHistory)
+  .post('/:id', verifyAccess, updateItemTransaction)
+  .delete('/:id', verifyAccess, deleteItemHistory);
 
 module.exports = router;
