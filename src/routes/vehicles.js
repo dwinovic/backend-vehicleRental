@@ -15,6 +15,7 @@ router
   .get('/', getAllVehicles)
   .post('/', verifyAccess, multipleUpload, createNewVehicle)
   .post('/images', verifyAccess, singleUpload, checkImageInput)
+  .get('/static/:id', getItemVehicle)
   .get('/:id', verifyAccess, getItemVehicle)
   .patch('/:id', verifyAccess, multipleUpload, updateVehicle)
   .delete('/:id', verifyAccess, deleteVehicle);

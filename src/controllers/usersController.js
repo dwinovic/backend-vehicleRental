@@ -231,6 +231,7 @@ module.exports = {
 
     let avatarUpload;
     const dataFilesRequest = req.file;
+    console.log('dataFilesRequest', dataFilesRequest);
 
     if (dataFilesRequest) {
       avatarUpload =
@@ -254,14 +255,17 @@ module.exports = {
     };
     console.log('newData update User', newData);
     // OLD Images
-    const oldAvatar = await UserModel.getUserId(id)
+    const getOldAvatar = await UserModel.getUserId(id)
       .then((result) => {
         const data = result[0].avatar;
         return data;
       })
       .catch(next);
-    // console.log(oldAvatar);
-
+    let oldAvatar;
+    if (getOldAvatar) {
+      oldAvatar = getOldAvatar.split('/').pop();
+      // console.log('oldAvatar', oldAvatar);
+    }
     UserModel.updateUser(id, newData)
       .then(async () => {
         // console.log(result);
@@ -271,6 +275,15 @@ module.exports = {
         } catch (err) {
           console.error('there was an error:', err.message);
         }
+        const ageCookie = 60000 * 60 * 3;
+        console.log('newData.avatar', newData.avatar);
+        res.cookie('avatar', newData.avatar ? newData.avatar : null, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
 
         response(res, 200, newData, {}, 'Success updated user!');
       })
@@ -411,9 +424,9 @@ module.exports = {
       .catch(next);
   },
   logout: (req, res, next) => {
-    res.clearCookie('tokenvr');
-    res.clearCookie('rolevr');
-    res.clearCookie('avatarvr');
+    res.clearCookie('token');
+    res.clearCookie('role');
+    res.clearCookie('avatar');
     response(res, 200, {}, {}, 'Success logout');
   },
 };
