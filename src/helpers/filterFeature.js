@@ -1,6 +1,6 @@
-const srcFeature = async (req, res, next, model) => {
-  const idUser = req.params.id;
-  const querySrc = req.query.src || '';
+const filterFeature = async (req, res, next, model) => {
+  const queryLocation = req.query.location || '';
+  const queryCategory = req.query.category || '';
   const queryLimit = parseInt(req.query.limit);
   const queryTables = req.baseUrl.substring(1);
   const querySort = req.query.sort || 'DESC';
@@ -19,17 +19,16 @@ const srcFeature = async (req, res, next, model) => {
 
   // GET DATA FROM MODELS
   await model(
-    querySrc,
+    queryLocation,
+    queryCategory,
     limit,
     queryTables,
     queryField,
     querySort,
     startIndex,
-    categoryQuery,
-    idUser
+    categoryQuery
   )
     .then((result) => {
-      // console.log(result);
       // res.status(200).json(result);
       // return;
 
@@ -38,7 +37,8 @@ const srcFeature = async (req, res, next, model) => {
       // totalPage
 
       dataResponse.meta = {
-        keyword: querySrc,
+        location: queryLocation,
+        category: queryCategory,
         totalData,
         totalPage: totalPage || 1,
         currentPage: queryPage,
@@ -70,4 +70,4 @@ const srcFeature = async (req, res, next, model) => {
   next();
 };
 
-module.exports = srcFeature;
+module.exports = filterFeature;

@@ -1,7 +1,8 @@
 const pagination = async (req, res, next, model) => {
   // RESPONSE
   const data = {};
-
+  // IS ID USER
+  const idUser = req.params.id;
   // default route, don't have a quey param, pure url
   const isQueryParams = Object.keys(req.query);
   // query pagination
@@ -10,7 +11,7 @@ const pagination = async (req, res, next, model) => {
   // const queryTables = req.baseUrl.substring(1)
   // query sort and filter
   const querySort = req.query.sort || 'DESC';
-  const queryField = req.query.field || 'updatedAt';
+  const queryField = req.query.field || 'createdAt';
   let page = 1;
   // default limit is 8
 
@@ -26,7 +27,7 @@ const pagination = async (req, res, next, model) => {
   if (isQueryParams.length === 0) {
     limit;
     startIndex = 0;
-    await model(queryField, querySort, limit, startIndex)
+    await model(queryField, querySort, limit, startIndex, idUser)
       .then((result) => {
         // console.log(result.countRows);
         // console.log(Object.keys(result));
@@ -82,10 +83,10 @@ const pagination = async (req, res, next, model) => {
   const getDataResult = data.data;
   // console.log(getDataResult);
   getDataResult.forEach((item) => {
-    const getImageResponse = item.imageProduct;
+    const getImageResponse = item.images;
     if (getImageResponse) {
       const parseToArray = getImageResponse.split(',').shift();
-      item.imageProduct = parseToArray;
+      item.images = parseToArray;
     }
   });
   // console.log('getDataResult', getDataResult);

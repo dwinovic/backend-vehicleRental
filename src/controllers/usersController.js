@@ -16,7 +16,7 @@ const verifiedEmail = require('../helpers/verifiedEmail');
 const privateKey = process.env.PRIVATE_KEY;
 
 module.exports = {
-  getAllUsers: async(req, res, next) => {
+  getAllUsers: async (req, res, next) => {
     try {
       // PAGINATION
       if (!req.query.src) {
@@ -60,7 +60,8 @@ module.exports = {
             srcResponse(
               res,
               error.statusCode,
-              meta, {},
+              meta,
+              {},
               error.message,
               error.message
             );
@@ -91,14 +92,16 @@ module.exports = {
           response(res, 404, {}, message, 'Failed');
         }
         const data = result[0];
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             id: data.idUser,
             email: data.email,
             role: data.role,
             name: data.name,
             verified: data.verified,
           },
-          privateKey, { expiresIn: '8h' }
+          privateKey,
+          { expiresIn: '8h' }
         );
         requestNewPasswordVerification(email, data.name, token);
         response(res, 200, 'Email verification have been send');
@@ -107,12 +110,20 @@ module.exports = {
   },
   verifyTokenUser: (req, res) => {
     const decodeResult = req.user;
-    UserModel.getUserEmail(decodeResult.email).then((result) => {
-      const dataResult = result[0];
-      delete dataResult.password;
-      response(res, 200, dataResult);
-    });
+    // console.log(decodeResult);
+    UserModel.getUserId(id)
+      .then((result) => {
+        const data = result;
+        response(res, 200, data);
+      })
+      .catch(next);
+    // UserModel.getUserEmail(decodeResult.email).then((result) => {
+    //   const dataResult = result[0];
+    //   delete dataResult.password;
+    //   response(res, 200, dataResult);
+    // });
   },
+
   createUser: (req, res, next) => {
     const { email, password, name, role } = req.body;
     // Hashing Password
@@ -143,19 +154,22 @@ module.exports = {
       .then(() => {
         // const email = 'cahyaulin@gmail.com';
         // JWT Token
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             id: dataUser.idUser,
             email: dataUser.email,
             role: dataUser.role,
             name: dataUser.name,
             actived: 0,
           },
-          privateKey, { expiresIn: '24h' }
+          privateKey,
+          { expiresIn: '24h' }
         );
         verifiedEmail(dataUser.email, dataUser.name, token);
 
         const dataResponse = dataUser;
         delete dataResponse.password;
+        dataResponse.token = token;
         response(res, 200, dataResponse);
       })
       .catch((err) => {
@@ -166,69 +180,112 @@ module.exports = {
         console.log(err);
       });
   },
-  updateUser: async(req, res, next) => {
+  updateUser: async (req, res, next) => {
     // Request
     const id = req.params.id;
+    const { name, born, phone, actived, activedDate, gender, address, avatar } =
+      req.body;
+    // console.log('idUser', id);
+    // UPDATE AVATAR
+    // if (req.file) {
+    //   const dataFilesRequest = req.file;
 
-    const {
-      name,
-      email,
-      born,
-      phone,
-      role,
-      actived,
-      activedDate,
-      gender,
-      address,
-      avatar,
-    } = req.body;
+    //   let avatarUpload;
+
+    //   if (dataFilesRequest) {
+    //     avatarUpload =
+    //       `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` ||
+    //       null;
+    //   }
+
+    //   const newData = {
+    //     avatar: avatarUpload ? avatarUpload : avatar,
+    //     updatedAt: new Date(),
+    //   };
+    //   // OLD Images
+    //   const oldAvatar = await UserModel.getUserId(id)
+    //     .then((result) => {
+    //       const data = result[0].avatar;
+    //       return data;
+    //     })
+    //     .catch(next);
+    //   // console.log(oldAvatar);
+
+    //   UserModel.updateUser(id, newData)
+    //     .then(async () => {
+    //       // console.log(result);
+    //       try {
+    //         await fs.unlinkSync(`public/images/${oldAvatar}`);
+    //         console.log(`successfully deleted ${oldAvatar}`);
+    //       } catch (err) {
+    //         console.error('there was an error:', err.message);
+    //       }
+
+    //       response(res, 200, newData, {}, 'Success updated user!');
+    //     })
+    //     .catch((err) => {
+    //       next(err);
+    //     });
+    // }
+    // UPDATE AVATAR
+
+    let avatarUpload;
+    const dataFilesRequest = req.file;
+    // console.log('dataFilesRequest', dataFilesRequest);
+
+    if (dataFilesRequest) {
+      avatarUpload =
+        `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` || null;
+    }
 
     // Hashing Password
     // const salt = bcrypt.genSaltSync(10);
     // const hash = bcrypt.hashSync(password, salt);
 
-    const dataFilesRequest = req.file;
-
-    let avatarUpload;
-
-    if (dataFilesRequest) {
-      avatarUpload = dataFilesRequest.filename || null;
-    }
-
     const newData = {
-      idUser: id,
       name,
-      email,
       born,
       phone,
-      role,
       actived,
       activedDate,
       gender,
       address,
-      avatar,
       avatar: avatarUpload ? avatarUpload : avatar,
       updatedAt: new Date(),
     };
-
+    console.log('newData update User', newData);
     // OLD Images
-    const oldAvatar = await UserModel.getUserId(id)
+    const getOldAvatar = await UserModel.getUserId(id)
       .then((result) => {
         const data = result[0].avatar;
         return data;
       })
       .catch(next);
-    console.log(oldAvatar);
-
+    let oldAvatar;
+    if (getOldAvatar) {
+      oldAvatar = getOldAvatar.split('/').pop();
+      // console.log('oldAvatar', oldAvatar);
+    }
     UserModel.updateUser(id, newData)
-      .then(async() => {
+      .then(async () => {
         // console.log(result);
         try {
-          await fs.unlinkSync(`public/images/${oldAvatar}`);
-          console.log(`successfully deleted ${oldAvatar}`);
+          if (avatarUpload) {
+            await fs.unlinkSync(`public/images/${oldAvatar}`);
+            console.log(`successfully deleted ${oldAvatar}`);
+          }
         } catch (err) {
           console.error('there was an error:', err.message);
         }
+        const ageCookie = 60000 * 60 * 3;
+        // console.log('newData.avatar', newData.avatar);
+        res.cookie('avatar', newData.avatar ? newData.avatar : null, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
 
         response(res, 200, newData, {}, 'Success updated user!');
       })
@@ -244,10 +301,10 @@ module.exports = {
     UserModel.getUserId(id)
       .then((result) => {
         const hashPassowrdDB = result[0].password;
-        bcrypt.compare(currentPassword, hashPassowrdDB, function(err, result) {
+        bcrypt.compare(currentPassword, hashPassowrdDB, function (err, result) {
           if (result == true) {
             const saltRounds = 10;
-            bcrypt.hash(newPassword, saltRounds, function(err, hash) {
+            bcrypt.hash(newPassword, saltRounds, function (err, hash) {
               const newPasswordInsert = {
                 password: hash,
               };
@@ -287,8 +344,8 @@ module.exports = {
     UserModel.getUserEmail(dataUserLogin.email)
       .then((result) => {
         const dataUserRes = result[0];
-
         // console.log(dataUserRes);
+
         let message;
 
         // Email Validation
@@ -308,28 +365,70 @@ module.exports = {
           response(res, 404, {}, message, 'Cannot login');
         }
         // JWT Token
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
+            idUser: dataUserRes.idUser,
             email: dataUserRes.email,
             role: dataUserRes.role,
             name: dataUserRes.name,
           },
-          privateKey, { expiresIn: '12h' }
+          privateKey,
+          { expiresIn: '12h' }
         );
 
-        const refreshToken = jwt.sign({
+        const refreshToken = jwt.sign(
+          {
             email: dataUserRes.email,
             role: dataUserRes.role,
             name: dataUserRes.name,
           },
-          privateKey, { expiresIn: `${24 * 7}h` }
+          privateKey,
+          { expiresIn: `${24 * 7}h` }
         );
-
+        // console.log(dataUserRes.avatar);
+        const ageCookie = 60000 * 60 * 3;
         delete dataUserRes.password;
+        // Set Cookies token
+        // 60 * 60 * 24 * 3
+        res.cookie('idUser', dataUserRes.idUser, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('token', token, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('role', dataUserRes.role, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
         dataUserRes.token = token;
         dataUserRes.refresh = refreshToken;
 
         response(res, 200, dataUserRes, {}, 'Login success');
       })
       .catch(next);
+  },
+  logout: (req, res, next) => {
+    res.clearCookie('token');
+    res.clearCookie('role');
+    res.clearCookie('avatar');
+    response(res, 200, {}, {}, 'Success logout');
   },
 };

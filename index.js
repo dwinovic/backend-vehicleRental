@@ -3,6 +3,7 @@ const express = require('express');
 const routes = require('./src/routes');
 const cors = require('cors');
 const { errorHandling } = require('./src/middleware');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 // eslint-disable-next-line no-undef
@@ -13,7 +14,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // CORS
-app.use(cors());
+const optionCors = {
+  credentials: true,
+  origin: process.env.HOST_CLIENT,
+};
+app.use(cors(optionCors));
+
+// Cookie Parser
+app.use(cookieParser());
 
 // api routes
 app.use('/v1', routes);
