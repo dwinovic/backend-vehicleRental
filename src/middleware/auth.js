@@ -8,6 +8,7 @@ const verifyAccess = (req, res, next) => {
   // const tokenHeader = req.headers.authorization;
   // Setting Verify from Cookie
   const token = req.cookies.token;
+  // console.log('token', token);
 
   if (!token) {
     const error = new Error('Server need token');

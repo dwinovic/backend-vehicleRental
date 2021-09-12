@@ -183,9 +183,9 @@ module.exports = {
   updateUser: async (req, res, next) => {
     // Request
     const id = req.params.id;
-    const { name, born, phone, actived, activedDate, gender, address } =
+    const { name, born, phone, actived, activedDate, gender, address, avatar } =
       req.body;
-    console.log('idUser', id);
+    // console.log('idUser', id);
     // UPDATE AVATAR
     // if (req.file) {
     //   const dataFilesRequest = req.file;
@@ -231,7 +231,7 @@ module.exports = {
 
     let avatarUpload;
     const dataFilesRequest = req.file;
-    console.log('dataFilesRequest', dataFilesRequest);
+    // console.log('dataFilesRequest', dataFilesRequest);
 
     if (dataFilesRequest) {
       avatarUpload =
@@ -250,7 +250,7 @@ module.exports = {
       activedDate,
       gender,
       address,
-      avatar: avatarUpload ? avatarUpload : null,
+      avatar: avatarUpload ? avatarUpload : avatar,
       updatedAt: new Date(),
     };
     console.log('newData update User', newData);
@@ -270,13 +270,15 @@ module.exports = {
       .then(async () => {
         // console.log(result);
         try {
-          await fs.unlinkSync(`public/images/${oldAvatar}`);
-          console.log(`successfully deleted ${oldAvatar}`);
+          if (avatarUpload) {
+            await fs.unlinkSync(`public/images/${oldAvatar}`);
+            console.log(`successfully deleted ${oldAvatar}`);
+          }
         } catch (err) {
           console.error('there was an error:', err.message);
         }
         const ageCookie = 60000 * 60 * 3;
-        console.log('newData.avatar', newData.avatar);
+        // console.log('newData.avatar', newData.avatar);
         res.cookie('avatar', newData.avatar ? newData.avatar : null, {
           httpOnly: true,
           maxAge: ageCookie,

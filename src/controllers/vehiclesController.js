@@ -256,7 +256,7 @@ module.exports = {
     } = req.body;
     console.log('images', images);
     const dataFilesRequest = req.files;
-    console.log('dataFilesRequest', dataFilesRequest);
+    // console.log('dataFilesRequest', dataFilesRequest);
 
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
@@ -267,7 +267,7 @@ module.exports = {
       });
     }
     if (images) {
-      console.log(images);
+      console.log('images', images);
       images.forEach((item, index) => {
         if (item !== 'undefined' && item !== 'false') {
           tmpImage.push(item);
@@ -288,9 +288,12 @@ module.exports = {
       category,
       description,
       price,
-      images: imagesStr,
       updatedAt: new Date(),
     };
+
+    if (images || dataFilesRequest) {
+      dataVehicle.images = imagesStr;
+    }
 
     // GET OLD IMAGE NAME
     let dataImageOld = await getItemVehicle(id)
@@ -310,13 +313,16 @@ module.exports = {
         // Delete old images
         dataImageOld.forEach(async (image) => {
           try {
-            await fs.unlinkSync(`public/images/${image}`);
-            console.log(`successfully deleted ${image}`);
+            if (dataFilesRequest) {
+              await fs.unlinkSync(`public/images/${image}`);
+              console.log(`successfully deleted ${image}`);
+            }
           } catch (error) {
             // console.error('there was an error:', error.message);
           }
         });
         const responseData = dataVehicle;
+        console.log('responseData', responseData);
         const resImages = responseData.images.split(',');
         responseData.images = resImages;
         response(res, 200, responseData);
