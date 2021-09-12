@@ -1,10 +1,11 @@
 {
-  "name": "restapi_v1",
+  "name": "vehciles-rental-backend",
   "version": "1.0.0",
   "description": "learn and practicing rest api with express js and mysql",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "standard",
     "lint": "eslint"
   },
