@@ -1,7 +1,7 @@
 const { response, srcResponse, srcFeature, pagination } = require('../helpers');
 const uidshort = require('short-uuid');
-const redis = require('redis');
-const client = redis.createClient();
+// const redis = require('redis');
+// const client = redis.createClient();
 const fs = require('fs');
 
 const {
@@ -99,8 +99,8 @@ module.exports = {
             );
           } else {
             // SET CACHE IN REDIS
-            const setCache = { meta, data };
-            client.setex('allproducts', 60 * 60, JSON.stringify(setCache));
+            // const setCache = { meta, data };
+            // client.setex('allproducts', 60 * 60, JSON.stringify(setCache));
 
             srcResponse(res, 200, meta, data, {});
           }
