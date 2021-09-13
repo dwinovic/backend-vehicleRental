@@ -284,7 +284,7 @@ module.exports = {
           maxAge: ageCookie,
           secure: true,
           path: '/',
-          sameSite: 'strict',
+          sameSite: 'none',
         });
 
         response(res, 200, newData, {}, 'Success updated user!');
@@ -395,28 +395,28 @@ module.exports = {
           maxAge: ageCookie,
           secure: true,
           path: '/',
-          sameSite: 'strict',
+          sameSite: 'none',
         });
         res.cookie('token', token, {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
           path: '/',
-          sameSite: 'strict',
+          sameSite: 'none',
         });
         res.cookie('role', dataUserRes.role, {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
           path: '/',
-          sameSite: 'strict',
+          sameSite: 'none',
         });
         res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
           path: '/',
-          sameSite: 'strict',
+          sameSite: 'none',
         });
         dataUserRes.token = token;
         dataUserRes.refresh = refreshToken;
