@@ -282,7 +282,7 @@ module.exports = {
         res.cookie('avatar', newData.avatar ? newData.avatar : null, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: true,
+          secure: false,
           path: '/',
           sameSite: 'none',
         });
@@ -393,28 +393,28 @@ module.exports = {
         res.cookie('idUser', dataUserRes.idUser, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: true,
+          secure: false,
           // path: '/',
           sameSite: 'none',
         });
         res.cookie('token', token, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: true,
+          secure: false,
           // path: '/',
           sameSite: 'none',
         });
         res.cookie('role', dataUserRes.role, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: true,
+          secure: false,
           // path: '/',
           sameSite: 'none',
         });
         res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: true,
+          secure: false,
           // path: '/',
           sameSite: 'none',
         });
