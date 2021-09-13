@@ -394,28 +394,28 @@ module.exports = {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
-          path: '/',
+          // path: '/',
           sameSite: 'none',
         });
         res.cookie('token', token, {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
-          path: '/',
+          // path: '/',
           sameSite: 'none',
         });
         res.cookie('role', dataUserRes.role, {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
-          path: '/',
+          // path: '/',
           sameSite: 'none',
         });
         res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
-          path: '/',
+          // path: '/',
           sameSite: 'none',
         });
         dataUserRes.token = token;
