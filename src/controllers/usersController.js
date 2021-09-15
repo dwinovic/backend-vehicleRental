@@ -244,9 +244,9 @@ module.exports = {
         res.cookie('avatar', newData.avatar ? newData.avatar : null, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: true,
+          secure: false,
           path: '/',
-          sameSite: 'strict',
+          sameSite: 'None',
         });
 
         response(res, 200, newData, {}, 'Success updated user!');
