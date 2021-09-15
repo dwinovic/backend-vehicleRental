@@ -15,6 +15,7 @@ const {
 } = require('../models/Vehicles');
 const { createNewMedia } = require('../models/Media');
 const filterFeature = require('../helpers/filterFeature');
+const cloudinary = require('../middleware/cloudinary');
 
 const uid = uidshort();
 
@@ -139,7 +140,7 @@ module.exports = {
         response(res, 500, {}, err);
       });
   },
-  createNewVehicle: (req, res) => {
+  createNewVehicle: async (req, res) => {
     const {
       name,
       location,
@@ -153,16 +154,24 @@ module.exports = {
       likes,
       idOwner,
     } = req.body;
+    const uploader = async (path) =>
+      await cloudinary.uploads(path, 'VehicleRental');
 
     const dataFilesRequest = req.files;
     // console.log(dataFilesRequest);
 
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
-    dataFilesRequest.forEach((item, index) => {
-      tmpImage.push(`${process.env.HOST_SERVER}/files/${item.filename}`);
-    });
-    const imagesStr = tmpImage.toString();
+
+    for (const file of dataFilesRequest) {
+      const { path } = file;
+      const newPath = await uploader(path);
+      console.log('newPath', newPath);
+      tmpImage.push(newPath.url);
+    }
+
+    const imagesStr = await tmpImage.toString();
+    // console.log('imagesStr', imagesStr);
     // END = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
 
     // UID
@@ -254,27 +263,40 @@ module.exports = {
       price,
       images,
     } = req.body;
-    console.log('images', images);
+    // console.log('images', images);
     const dataFilesRequest = req.files;
+    const uploader = async (path) =>
+      await cloudinary.uploads(path, 'VehicleRental');
     // console.log('dataFilesRequest', dataFilesRequest);
 
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
 
     if (dataFilesRequest) {
-      dataFilesRequest.forEach((item, index) => {
-        tmpImage.push(`${process.env.HOST_SERVER}/files/${item.filename}`);
-      });
+      // dataFilesRequest.forEach((item, index) => {
+      //   tmpImage.push(`${process.env.HOST_SERVER}/files/${item.filename}`);
+      // });
+      for (const file of dataFilesRequest) {
+        const { path } = file;
+        const newPath = await uploader(path);
+        console.log('newPath', newPath);
+        tmpImage.push(newPath.url);
+      }
     }
     if (images) {
-      console.log('images', images);
-      images.forEach((item, index) => {
-        if (item !== 'undefined' && item !== 'false') {
+      // console.log('images', images);
+      // images.forEach((item, index) => {
+      //   if (item !== 'undefined' && item !== 'false') {
+      //     tmpImage.push(item);
+      //   }
+      // });
+      for (const image of images) {
+        if (image !== 'undefined' && image !== 'false') {
           tmpImage.push(item);
         }
-      });
+      }
     }
-    let imagesStr = tmpImage.toString();
+    let imagesStr = await tmpImage.toString();
     console.log('imagesStr', imagesStr);
     // END = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
 
