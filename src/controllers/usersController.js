@@ -386,38 +386,38 @@ module.exports = {
           { expiresIn: `${24 * 7}h` }
         );
         // console.log(dataUserRes.avatar);
-        const ageCookie = 60000 * 60 * 3;
+        // const ageCookie = 60000 * 60 * 3;
         delete dataUserRes.password;
         // Set Cookies token
         // 60 * 60 * 24 * 3
-        res.cookie('idUser', dataUserRes.idUser, {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          path: '/',
-          sameSite: 'strict',
-        });
-        res.cookie('token', token, {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          path: '/',
-          sameSite: 'strict',
-        });
-        res.cookie('role', dataUserRes.role, {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          path: '/',
-          sameSite: 'strict',
-        });
-        res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          path: '/',
-          sameSite: 'strict',
-        });
+        // res.cookie('idUser', dataUserRes.idUser, {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
+        // res.cookie('token', token, {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
+        // res.cookie('role', dataUserRes.role, {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
+        // res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
         dataUserRes.token = token;
         dataUserRes.refresh = refreshToken;
 
