@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const verifiedEmail = require('../helpers/verifiedEmail');
-
+const cloudinary = require('../middleware/cloudinary');
 // eslint-disable-next-line no-undef
 const privateKey = process.env.PRIVATE_KEY;
 
@@ -108,22 +108,25 @@ module.exports = {
       })
       .catch(next);
   },
-  verifyTokenUser: (req, res) => {
-    const decodeResult = req.user;
-    // console.log(decodeResult);
-    UserModel.getUserId(id)
-      .then((result) => {
-        const data = result;
-        response(res, 200, data);
-      })
-      .catch(next);
-    // UserModel.getUserEmail(decodeResult.email).then((result) => {
-    //   const dataResult = result[0];
-    //   delete dataResult.password;
-    //   response(res, 200, dataResult);
-    // });
+  verifyTokenUser: (req, res, next) => {
+    const token = req.params.token;
+    const decoded = jwt.verify(token, privateKey);
+    console.log('decoded', decoded);
+    if (!decoded.actived) {
+      UserModel.updateUser(decoded.id, { actived: 1 })
+        .then((result) => {
+          console.log(result);
+          const dataResponse = {
+            ...decoded,
+            actived: 1,
+          };
+          response(res, 200, dataResponse, {}, 'Success user verified!');
+        })
+        .catch((err) => {
+          next(err);
+        });
+    }
   },
-
   createUser: (req, res, next) => {
     const { email, password, name, role } = req.body;
     // Hashing Password
@@ -185,57 +188,20 @@ module.exports = {
     const id = req.params.id;
     const { name, born, phone, actived, activedDate, gender, address, avatar } =
       req.body;
-    // console.log('idUser', id);
     // UPDATE AVATAR
-    // if (req.file) {
-    //   const dataFilesRequest = req.file;
+    const uploader = async (path) =>
+      await cloudinary.uploads(path, 'VehicleRental');
 
-    //   let avatarUpload;
-
-    //   if (dataFilesRequest) {
-    //     avatarUpload =
-    //       `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` ||
-    //       null;
-    //   }
-
-    //   const newData = {
-    //     avatar: avatarUpload ? avatarUpload : avatar,
-    //     updatedAt: new Date(),
-    //   };
-    //   // OLD Images
-    //   const oldAvatar = await UserModel.getUserId(id)
-    //     .then((result) => {
-    //       const data = result[0].avatar;
-    //       return data;
-    //     })
-    //     .catch(next);
-    //   // console.log(oldAvatar);
-
-    //   UserModel.updateUser(id, newData)
-    //     .then(async () => {
-    //       // console.log(result);
-    //       try {
-    //         await fs.unlinkSync(`public/images/${oldAvatar}`);
-    //         console.log(`successfully deleted ${oldAvatar}`);
-    //       } catch (err) {
-    //         console.error('there was an error:', err.message);
-    //       }
-
-    //       response(res, 200, newData, {}, 'Success updated user!');
-    //     })
-    //     .catch((err) => {
-    //       next(err);
-    //     });
-    // }
-    // UPDATE AVATAR
-
-    let avatarUpload;
+    let uploadImage;
     const dataFilesRequest = req.file;
     // console.log('dataFilesRequest', dataFilesRequest);
 
     if (dataFilesRequest) {
-      avatarUpload =
-        `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` || null;
+      // avatarUpload =
+      //   `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` || null;
+      uploadImage = await uploader(dataFilesRequest.path);
+      // Upload image to cloudinary
+      // uploadImage = await cloudinary.uploader.upload(dataFilesRequest.path);
     }
 
     // Hashing Password
@@ -250,7 +216,7 @@ module.exports = {
       activedDate,
       gender,
       address,
-      avatar: avatarUpload ? avatarUpload : avatar,
+      avatar: uploadImage.url ? uploadImage.url : avatar,
       updatedAt: new Date(),
     };
     console.log('newData update User', newData);
@@ -269,14 +235,14 @@ module.exports = {
     UserModel.updateUser(id, newData)
       .then(async () => {
         // console.log(result);
-        try {
-          if (avatarUpload) {
-            await fs.unlinkSync(`public/images/${oldAvatar}`);
-            console.log(`successfully deleted ${oldAvatar}`);
-          }
-        } catch (err) {
-          console.error('there was an error:', err.message);
-        }
+        // try {
+        //   if (avatarUpload) {
+        //     await fs.unlinkSync(`public/images/${oldAvatar}`);
+        //     console.log(`successfully deleted ${oldAvatar}`);
+        //   }
+        // } catch (err) {
+        //   console.error('there was an error:', err.message);
+        // }
         const ageCookie = 60000 * 60 * 3;
         // console.log('newData.avatar', newData.avatar);
         res.cookie('avatar', newData.avatar ? newData.avatar : null, {
@@ -393,31 +359,31 @@ module.exports = {
         res.cookie('idUser', dataUserRes.idUser, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: false,
-          // path: '/',
-          sameSite: 'None',
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
         });
         res.cookie('token', token, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: false,
-          // path: '/',
-          sameSite: 'None',
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
         });
         res.cookie('role', dataUserRes.role, {
           httpOnly: true,
           maxAge: ageCookie,
-          secure: false,
-          // path: '/',
-          sameSite: 'None',
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
         });
-        res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: false,
-          // path: '/',
-          sameSite: 'None',
-        });
+        // res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
         dataUserRes.token = token;
         dataUserRes.refresh = refreshToken;
 

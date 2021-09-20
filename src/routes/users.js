@@ -6,7 +6,7 @@ const { singleUpload } = require('../middleware/multer');
 
 router
   .get('/', userController.getAllUsers)
-  .get('/verify-token', verifyAccess, userController.verifyTokenUser)
+  .get('/verify-token/:token', userController.verifyTokenUser)
   .post('/register', userController.createUser)
   .post('/login', userController.loginUser)
   .get('/logout', userController.logout)
