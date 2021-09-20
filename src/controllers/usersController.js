@@ -108,20 +108,24 @@ module.exports = {
       })
       .catch(next);
   },
-  verifyTokenUser: (req, res) => {
-    const decodeResult = req.user;
-    // console.log(decodeResult);
-    UserModel.getUserId(id)
-      .then((result) => {
-        const data = result;
-        response(res, 200, data);
-      })
-      .catch(next);
-    // UserModel.getUserEmail(decodeResult.email).then((result) => {
-    //   const dataResult = result[0];
-    //   delete dataResult.password;
-    //   response(res, 200, dataResult);
-    // });
+  verifyTokenUser: (req, res, next) => {
+    const token = req.params.token;
+    const decoded = jwt.verify(token, privateKey);
+    console.log('decoded', decoded);
+    if (!decoded.actived) {
+      UserModel.updateUser(decoded.id, { actived: 1 })
+        .then((result) => {
+          console.log(result);
+          const dataResponse = {
+            ...decoded,
+            actived: 1,
+          };
+          response(res, 200, dataResponse, {}, 'Success user verified!');
+        })
+        .catch((err) => {
+          next(err);
+        });
+    }
   },
   createUser: (req, res, next) => {
     const { email, password, name, role } = req.body;
@@ -231,14 +235,14 @@ module.exports = {
     UserModel.updateUser(id, newData)
       .then(async () => {
         // console.log(result);
-        try {
-          if (avatarUpload) {
-            await fs.unlinkSync(`public/images/${oldAvatar}`);
-            console.log(`successfully deleted ${oldAvatar}`);
-          }
-        } catch (err) {
-          console.error('there was an error:', err.message);
-        }
+        // try {
+        //   if (avatarUpload) {
+        //     await fs.unlinkSync(`public/images/${oldAvatar}`);
+        //     console.log(`successfully deleted ${oldAvatar}`);
+        //   }
+        // } catch (err) {
+        //   console.error('there was an error:', err.message);
+        // }
         const ageCookie = 60000 * 60 * 3;
         // console.log('newData.avatar', newData.avatar);
         res.cookie('avatar', newData.avatar ? newData.avatar : null, {
@@ -348,31 +352,31 @@ module.exports = {
           { expiresIn: `${24 * 7}h` }
         );
         // console.log(dataUserRes.avatar);
-        // const ageCookie = 60000 * 60 * 3;
+        const ageCookie = 60000 * 60 * 3;
         delete dataUserRes.password;
         // Set Cookies token
         // 60 * 60 * 24 * 3
-        // res.cookie('idUser', dataUserRes.idUser, {
-        //   httpOnly: true,
-        //   maxAge: ageCookie,
-        //   secure: true,
-        //   path: '/',
-        //   sameSite: 'strict',
-        // });
-        // res.cookie('token', token, {
-        //   httpOnly: true,
-        //   maxAge: ageCookie,
-        //   secure: true,
-        //   path: '/',
-        //   sameSite: 'strict',
-        // });
-        // res.cookie('role', dataUserRes.role, {
-        //   httpOnly: true,
-        //   maxAge: ageCookie,
-        //   secure: true,
-        //   path: '/',
-        //   sameSite: 'strict',
-        // });
+        res.cookie('idUser', dataUserRes.idUser, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('token', token, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
+        res.cookie('role', dataUserRes.role, {
+          httpOnly: true,
+          maxAge: ageCookie,
+          secure: true,
+          path: '/',
+          sameSite: 'strict',
+        });
         // res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
         //   httpOnly: true,
         //   maxAge: ageCookie,
