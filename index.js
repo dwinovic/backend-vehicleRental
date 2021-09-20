@@ -28,7 +28,7 @@ app.use(cookieParser());
 // api routes
 app.use('/v1', routes);
 app.use('/files', express.static('./public/images'));
-app.use(enforce.HTTPS());
+app.use(enforce.HTTPS({ trustProtoHeader: true }));
 app.use((err, req, res, next) => {
   errorHandling(err, req, res, next);
   next();
