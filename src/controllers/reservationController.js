@@ -1,6 +1,7 @@
 const { response } = require('../helpers');
 const ReservationModel = require('../models/Reservation');
 const uidshort = require('short-uuid');
+const { getHistoryReservation } = require('../models/Reservation');
 
 const {
   getAllReservation,
@@ -27,9 +28,25 @@ module.exports = {
   },
   getItemReservation: (req, res) => {
     const id = req.params.id;
+    console.log(id);
     getItemReservation(id)
       .then((result) => {
         const data = result;
+        // console.log('data', data);
+        response(res, 200, data, {}, 'Success get method item');
+      })
+      .catch((err) => {
+        response(res, 500, {}, err, 'Error get method item');
+      });
+  },
+  getHistoryReservation: (req, res) => {
+    const id = req.params.id;
+    const { role } = req.body;
+    console.log('role', role);
+    getHistoryReservation(id, role)
+      .then((result) => {
+        const data = result;
+        // console.log('data', data);
         response(res, 200, data, {}, 'Success get method item');
       })
       .catch((err) => {
@@ -57,14 +74,15 @@ module.exports = {
       idReservation: idReservation,
       idVehicles,
       idCustomer,
-      reservationStartDate,
-      reservationEndDate,
+      reservationStartDate: new Date(reservationStartDate),
+      reservationEndDate: new Date(reservationEndDate),
       reservationQty,
       priceTotal,
       status,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+    console.log('dataSend', dataSend);
     createReservation(dataSend)
       .then(() => {
         // console.log(result);
@@ -75,19 +93,23 @@ module.exports = {
       });
   },
   updateReservation: (req, res) => {
-    const { status } = req.body;
+    const { status, payment_method } = req.body;
+
     const id = req.params.id;
+
     const data = {
       status,
+      payment_method,
       updatedAt: new Date(),
     };
+
     updateReservation(id, data)
-      .then(() => {
-        // console.log(result);
+      .then((result) => {
+        console.log(result);
         response(res, 200, {}, {}, `Success update reservation`);
       })
       .catch((err) => {
-        // console.log(err);
+        console.log(err);
         response(res, 500, {}, err, `Failed to update reservation`);
       });
   },
