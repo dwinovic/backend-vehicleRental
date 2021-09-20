@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const verifiedEmail = require('../helpers/verifiedEmail');
-
+const cloudinary = require('../middleware/cloudinary');
 // eslint-disable-next-line no-undef
 const privateKey = process.env.PRIVATE_KEY;
 
@@ -123,7 +123,6 @@ module.exports = {
     //   response(res, 200, dataResult);
     // });
   },
-
   createUser: (req, res, next) => {
     const { email, password, name, role } = req.body;
     // Hashing Password
@@ -185,57 +184,20 @@ module.exports = {
     const id = req.params.id;
     const { name, born, phone, actived, activedDate, gender, address, avatar } =
       req.body;
-    // console.log('idUser', id);
     // UPDATE AVATAR
-    // if (req.file) {
-    //   const dataFilesRequest = req.file;
+    const uploader = async (path) =>
+      await cloudinary.uploads(path, 'VehicleRental');
 
-    //   let avatarUpload;
-
-    //   if (dataFilesRequest) {
-    //     avatarUpload =
-    //       `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` ||
-    //       null;
-    //   }
-
-    //   const newData = {
-    //     avatar: avatarUpload ? avatarUpload : avatar,
-    //     updatedAt: new Date(),
-    //   };
-    //   // OLD Images
-    //   const oldAvatar = await UserModel.getUserId(id)
-    //     .then((result) => {
-    //       const data = result[0].avatar;
-    //       return data;
-    //     })
-    //     .catch(next);
-    //   // console.log(oldAvatar);
-
-    //   UserModel.updateUser(id, newData)
-    //     .then(async () => {
-    //       // console.log(result);
-    //       try {
-    //         await fs.unlinkSync(`public/images/${oldAvatar}`);
-    //         console.log(`successfully deleted ${oldAvatar}`);
-    //       } catch (err) {
-    //         console.error('there was an error:', err.message);
-    //       }
-
-    //       response(res, 200, newData, {}, 'Success updated user!');
-    //     })
-    //     .catch((err) => {
-    //       next(err);
-    //     });
-    // }
-    // UPDATE AVATAR
-
-    let avatarUpload;
+    let uploadImage;
     const dataFilesRequest = req.file;
     // console.log('dataFilesRequest', dataFilesRequest);
 
     if (dataFilesRequest) {
-      avatarUpload =
-        `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` || null;
+      // avatarUpload =
+      //   `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` || null;
+      uploadImage = await uploader(dataFilesRequest.path);
+      // Upload image to cloudinary
+      // uploadImage = await cloudinary.uploader.upload(dataFilesRequest.path);
     }
 
     // Hashing Password
@@ -250,7 +212,7 @@ module.exports = {
       activedDate,
       gender,
       address,
-      avatar: avatarUpload ? avatarUpload : avatar,
+      avatar: uploadImage.url ? uploadImage.url : avatar,
       updatedAt: new Date(),
     };
     console.log('newData update User', newData);
@@ -386,38 +348,38 @@ module.exports = {
           { expiresIn: `${24 * 7}h` }
         );
         // console.log(dataUserRes.avatar);
-        const ageCookie = 60000 * 60 * 3;
+        // const ageCookie = 60000 * 60 * 3;
         delete dataUserRes.password;
         // Set Cookies token
         // 60 * 60 * 24 * 3
-        res.cookie('idUser', dataUserRes.idUser, {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          // path: '/',
-          sameSite: 'None',
-        });
-        res.cookie('token', token, {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          // path: '/',
-          sameSite: 'None',
-        });
-        res.cookie('role', dataUserRes.role, {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          // path: '/',
-          sameSite: 'None',
-        });
-        res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
-          httpOnly: true,
-          maxAge: ageCookie,
-          secure: true,
-          // path: '/',
-          sameSite: 'None',
-        });
+        // res.cookie('idUser', dataUserRes.idUser, {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
+        // res.cookie('token', token, {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
+        // res.cookie('role', dataUserRes.role, {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
+        // res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
+        //   httpOnly: true,
+        //   maxAge: ageCookie,
+        //   secure: true,
+        //   path: '/',
+        //   sameSite: 'strict',
+        // });
         dataUserRes.token = token;
         dataUserRes.refresh = refreshToken;
 
