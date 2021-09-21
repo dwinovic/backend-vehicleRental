@@ -13,7 +13,7 @@
     <a href="https://github.com/dwinovic/backend-vehicleRental"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://vehicles-rental.vercel.app/">View Demo</a>
+    <a href="https://vehicle.noopik.com/">View Demo</a>
     ·
     <a href="https://github.com/dwinovic/VehiclesRental">Report Bug</a>
     ·
