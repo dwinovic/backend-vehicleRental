@@ -8,7 +8,7 @@
   <h3 align="center">Vehicle Rental</h3>
 
   <p align="center">
-    Blalala Blalala Blalala <br> Blalala Blalala Blalala Blalala Blalala
+    Vehicle Rental is a platform for providing vehicle rental services  <br> from various major cities in Indonesia. The service provider is managed by a trusted vendor.
     <br />
     <a href="https://github.com/dwinovic/backend-vehicleRental"><strong>Explore the docs »</strong></a>
     <br />
@@ -54,7 +54,7 @@
 
 ## About The Project
 
-<b>Vehicle Rental</b> is a Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala Blalala
+<b>Vehicle Rental</b> is a platform for providing vehicle rental services from various major cities in Indonesia. The service provider is managed by a trusted vendor.
 
 ### Build With
 * [Express Js](https://expressjs.com/)
