@@ -216,7 +216,7 @@ module.exports = {
       activedDate,
       gender,
       address,
-      avatar: uploadImage.url ? uploadImage.url : avatar,
+      avatar: uploadImage ? uploadImage.url : avatar,
       updatedAt: new Date(),
     };
     console.log('newData update User', newData);
