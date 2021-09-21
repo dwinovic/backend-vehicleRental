@@ -361,7 +361,7 @@ module.exports = {
           maxAge: ageCookie,
           secure: true,
           domain: `.noopik.com`,
-          // path: '/',
+          path: '/',
           sameSite: 'strict',
         });
         res.cookie('token', token, {
@@ -369,7 +369,7 @@ module.exports = {
           maxAge: ageCookie,
           secure: true,
           domain: `.noopik.com`,
-          // path: '/',
+          path: '/',
           sameSite: 'strict',
         });
         res.cookie('role', dataUserRes.role, {
@@ -377,7 +377,7 @@ module.exports = {
           maxAge: ageCookie,
           secure: true,
           domain: `.noopik.com`,
-          // path: '/',
+          path: '/',
           sameSite: 'strict',
         });
         // res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
