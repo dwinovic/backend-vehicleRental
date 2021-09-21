@@ -216,7 +216,7 @@ module.exports = {
       activedDate,
       gender,
       address,
-      avatar: uploadImage.url ? uploadImage.url : avatar,
+      avatar: uploadImage ? uploadImage.url : avatar,
       updatedAt: new Date(),
     };
     console.log('newData update User', newData);
@@ -360,22 +360,25 @@ module.exports = {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
+          domain: `.noopik.com`,
           // path: '/',
-          sameSite: 'none',
+          sameSite: 'strict',
         });
         res.cookie('token', token, {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
+          domain: `.noopik.com`,
           // path: '/',
-          sameSite: 'none',
+          sameSite: 'strict',
         });
         res.cookie('role', dataUserRes.role, {
           httpOnly: true,
           maxAge: ageCookie,
           secure: true,
+          domain: `.noopik.com`,
           // path: '/',
-          sameSite: 'none',
+          sameSite: 'strict',
         });
         // res.cookie('avatar', dataUserRes.avatar ? dataUserRes.avatar : '', {
         //   httpOnly: true,
