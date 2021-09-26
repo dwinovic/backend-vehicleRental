@@ -154,20 +154,15 @@ module.exports = {
       likes,
       idOwner,
     } = req.body;
-    const uploader = async (path) =>
-      await cloudinary.uploads(path, 'VehicleRental');
-
-    const dataFilesRequest = req.files;
-    // console.log(dataFilesRequest);
+    const fileUpload = req.files;
+    // console.log(fileUpload);
 
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
 
-    for (const file of dataFilesRequest) {
+    for (const file of fileUpload) {
       const { path } = file;
-      const newPath = await uploader(path);
-      console.log('newPath', newPath);
-      tmpImage.push(newPath.url);
+      tmpImage.push(path);
     }
 
     const imagesStr = await tmpImage.toString();
@@ -264,25 +259,23 @@ module.exports = {
       images,
     } = req.body;
     // console.log('images', images);
-    const dataFilesRequest = req.files;
-    const uploader = async (path) =>
-      await cloudinary.uploads(path, 'VehicleRental');
-    // console.log('dataFilesRequest', dataFilesRequest);
+    const fileUpload = req.files;
+    console.log('req.body', req.body);
+    console.log('fileUpload', fileUpload);
 
     // START = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
     let tmpImage = [];
 
-    if (dataFilesRequest) {
-      // dataFilesRequest.forEach((item, index) => {
+    if (fileUpload) {
+      // fileUpload.forEach((item, index) => {
       //   tmpImage.push(`${process.env.HOST_SERVER}/files/${item.filename}`);
       // });
-      for (const file of dataFilesRequest) {
+      for (const file of fileUpload) {
         const { path } = file;
-        const newPath = await uploader(path);
-        console.log('newPath', newPath);
-        tmpImage.push(newPath.url);
+        tmpImage.push(path);
       }
     }
+
     if (images) {
       // console.log('images', images);
       // images.forEach((item, index) => {
@@ -292,10 +285,11 @@ module.exports = {
       // });
       for (const image of images) {
         if (image !== 'undefined' && image !== 'false') {
-          tmpImage.push(item);
+          tmpImage.push(image);
         }
       }
     }
+
     let imagesStr = await tmpImage.toString();
     console.log('imagesStr', imagesStr);
     // END = HANDLE UPLOAD WITHIN ONE TABLE VEHICLES
@@ -313,41 +307,41 @@ module.exports = {
       updatedAt: new Date(),
     };
 
-    if (images || dataFilesRequest) {
+    if (images || fileUpload) {
       dataVehicle.images = imagesStr;
     }
 
     // GET OLD IMAGE NAME
-    let dataImageOld = await getItemVehicle(id)
-      .then((result) => {
-        const imageResponse = result[0].images;
-        const imageArray = imageResponse.split(',');
-        return imageArray;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // let dataImageOld = await getItemVehicle(id)
+    //   .then((result) => {
+    //     const imageResponse = result[0].images;
+    //     const imageArray = imageResponse.split(',');
+    //     return imageArray;
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
 
     // UPDATE PRODUCTS
-    // console.log('dataImageOld', dataImageOld);
+    console.log('dataVehicle', dataVehicle);
     updateItemVehicle(id, dataVehicle)
       .then(() => {
         // Delete old images
-        dataImageOld.forEach(async (image) => {
-          try {
-            if (dataFilesRequest) {
-              await fs.unlinkSync(`public/images/${image}`);
-              console.log(`successfully deleted ${image}`);
-            }
-          } catch (error) {
-            // console.error('there was an error:', error.message);
-          }
-        });
-        const responseData = dataVehicle;
-        console.log('responseData', responseData);
-        const resImages = responseData.images.split(',');
-        responseData.images = resImages;
-        response(res, 200, responseData);
+        // dataImageOld.forEach(async (image) => {
+        //   try {
+        //     if (dataFilesRequest) {
+        //       await fs.unlinkSync(`public/images/${image}`);
+        //       console.log(`successfully deleted ${image}`);
+        //     }
+        //   } catch (error) {
+        //     // console.error('there was an error:', error.message);
+        //   }
+        // });
+        // const responseData = dataVehicle;
+        // console.log('responseData', responseData);
+        // const resImages = responseData.images.split(',');
+        // responseData.images = resImages;
+        response(res, 200, dataVehicle);
       })
       .catch((err) => {
         response(res, 500, {}, err);

@@ -11,9 +11,12 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const verifiedEmail = require('../helpers/verifiedEmail');
-const cloudinary = require('../middleware/cloudinary');
+const cloudinary = require('cloudinary').v2;
+const { configCloudinary } = require('../middleware/cloudinary');
 // eslint-disable-next-line no-undef
 const privateKey = process.env.PRIVATE_KEY;
+
+cloudinary.config(configCloudinary);
 
 module.exports = {
   getAllUsers: async (req, res, next) => {
@@ -189,20 +192,20 @@ module.exports = {
     const { name, born, phone, actived, activedDate, gender, address, avatar } =
       req.body;
     // UPDATE AVATAR
-    const uploader = async (path) =>
-      await cloudinary.uploads(path, 'VehicleRental');
+    // const uploader = async (path) =>
+    //   await cloudinary.uploads(path, 'VehicleRental');
 
-    let uploadImage;
-    const dataFilesRequest = req.file;
-    // console.log('dataFilesRequest', dataFilesRequest);
+    // let uploadImage;
+    const fileUpload = req.file;
+    console.log('fileUpload', fileUpload);
 
-    if (dataFilesRequest) {
-      // avatarUpload =
-      //   `${process.env.HOST_SERVER}/files/${dataFilesRequest.filename}` || null;
-      uploadImage = await uploader(dataFilesRequest.path);
-      // Upload image to cloudinary
-      // uploadImage = await cloudinary.uploader.upload(dataFilesRequest.path);
-    }
+    // if (fileUpload) {
+    // avatarUpload =
+    //   `${process.env.HOST_SERVER}/files/${fileUpload.filename}` || null;
+    // uploadImage = await uploader(fileUpload.path);
+    // Upload image to cloudinary
+    // uploadImage = await cloudinary.uploader.upload(fileUpload.path);
+    // }
 
     // Hashing Password
     // const salt = bcrypt.genSaltSync(10);
@@ -216,7 +219,7 @@ module.exports = {
       activedDate,
       gender,
       address,
-      avatar: uploadImage ? uploadImage.url : avatar,
+      avatar: fileUpload ? fileUpload.path : avatar,
       updatedAt: new Date(),
     };
     console.log('newData update User', newData);
