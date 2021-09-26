@@ -3,6 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const short = require('short-uuid');
 const maxSize = 1024 * 1024 * 2;
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { configCloudinary } = require('./cloudinary');
 
 // START =  MULTIPLE UPLOAD
 // const storageMultiple = multer.diskStorage({
@@ -18,9 +21,18 @@ const maxSize = 1024 * 1024 * 2;
 //   },
 // });
 
+cloudinary.config(configCloudinary);
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'vehicleRental',
+  },
+});
+
 const multipleUpload = multer({
-  // storage: storageMultiple,
-  storage: multer.diskStorage({}),
+  storage: storage,
+  // storage: multer.diskStorage({}),
   limits: { fileSize: maxSize * 8 },
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
@@ -39,8 +51,8 @@ const multipleUpload = multer({
 // });
 
 const singleUpload = multer({
-  // storage: singleStorage,
-  storage: multer.diskStorage({}),
+  storage: storage,
+  // storage: multer.diskStorage({}),
   limits: { fileSize: maxSize },
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
