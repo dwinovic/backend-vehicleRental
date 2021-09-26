@@ -5,7 +5,7 @@
     <img src="https://res.cloudinary.com/dnv-images/image/upload/v1631957118/VehicleRental/ewallet_2_ktkxde.svg" alt="Logo" width="180" height="180">
   </a>
 
-  <h3 align="center">RESTful API for Vehicle Rental</h3>
+  <h3 align="center">Backend Application for Vehicle Rental</h3>
 
   <p align="center">
   Back-end application or server in charge of supplying <br> Vehicle Rental web application data needs through Rest API technology.
@@ -54,7 +54,7 @@
 
 ## About The Project
 
-<b>Vehicle Rental</b> is a platform for providing vehicle rental services from various major cities in Indonesia. The service provider is managed by a trusted vendor.
+<b>Vehicle Rental</b> is a website that provides vehicle rental services in various major cities in Indonesia. It has features such as users can rent the desired vehicle, search for vehicles based on certain categories, order history, admin can add vehicles, change vehicles, and users can update personal data.
 
 ### Build With
 * [Express Js](https://expressjs.com/)
